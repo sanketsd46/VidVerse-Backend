@@ -9,20 +9,15 @@ const generateAccessAndRefereshTokens = async (userId) => {
     try {
         const user = await User.findById(userId)
 
-
         const accessToken = user.generateAccessToken()
-
-
 
         const refreshToken = user.generateRefreshToken()
 
-
-
         user.refreshToken = refreshToken
+
         await user.save({ validateBeforeSave: false })
 
         return { accessToken, refreshToken }
-
 
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating referesh and access token")
@@ -43,8 +38,6 @@ const userRegistration = asyncHandler(async (req, res) => {
         isVerified: true
     })
 
-
-
     if (verifiedUser) {
         throw new ApiError(409, "user with this username alredy exist");
     }
@@ -52,8 +45,6 @@ const userRegistration = asyncHandler(async (req, res) => {
     let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     const existingUserByEmail = await User.findOne({ email })
-   
-
 
     if (existingUserByEmail) {
         if (existingUserByEmail.isVerified) {
@@ -63,7 +54,7 @@ const userRegistration = asyncHandler(async (req, res) => {
             existingUserByEmail.verifyCode = verifyCode;
             existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000);
             await existingUserByEmail.save();
-            await sendVerificationEmail({email:existingUserByEmail.email,verifyCode})
+            await sendVerificationEmail({ email: existingUserByEmail.email, verifyCode })
             return res.status(200).json(new ApiResponse(200, existingUserByEmail, "user registration successfull please get verified"))
         }
     }
@@ -81,7 +72,7 @@ const userRegistration = asyncHandler(async (req, res) => {
     })
 
     const newUser = await User.findById(user._id)
-    const emailResponse = await sendVerificationEmail({email:user.email,verifyCode} )
+    const emailResponse = await sendVerificationEmail({ email: user.email, verifyCode })
 
 
     if (!emailResponse) {
@@ -92,16 +83,11 @@ const userRegistration = asyncHandler(async (req, res) => {
 
 })
 
-const verifyEmail = asyncHandler(async(req,res)=>{
-    
-    const {otp,username} = req.body
+const verifyEmail = asyncHandler(async (req, res) => {
 
-    console.log(username);
-    
+    const { otp, username } = req.body
 
-    const user =await User.findOne({username})
-
-    console.log(user);
+    const user = await User.findOne({ username })
 
     const isCodeValid = user.verifyCode === otp
 
@@ -142,8 +128,6 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
-
-
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
@@ -310,8 +294,6 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Avatar file is missing")
     }
 
-    //TODO: delete old image - assignment
-
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
     if (!avatar.url) {
@@ -343,9 +325,6 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Cover image file is missing")
     }
 
-    //TODO: delete old image - assignment
-
-
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
     if (!coverImage.url) {
@@ -369,70 +348,6 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
             new ApiResponse(200, user, "Cover image updated successfully")
         )
 })
-
-// const getUserChannelProfiles = asyncHandler(async(req,res)=>{
-
-//     const {username} = req.params
-
-//     const channel = await User.aggregate([
-//         {
-//             $match:{
-//                 username:username
-//             }
-//         },
-//         {
-//             $lookup:{
-//                 from:"subscriptions",
-//                 localField:"_id",
-//                 foreignField:"channel",
-//                 as:"subscribers"
-//             }
-//         },
-//         {
-//             $lookup:{
-//                 from:"subscriptions",
-//                 localField:"_id",
-//                 foreignField:"subscriber",
-//                 as:"subscribedTo"
-//             }
-//         },
-//         {
-//             $addFields:{
-//                 subscribersCount:{
-//                     $size:"$subscribers"
-//                 },
-//                 subscribedToCount:{
-//                     $size:"$subscribedTo"
-//                 },
-//                 isSubscribed:{
-//                     $cond:{
-//                         if:{ $in: [req.user?._id, "$subscribers.subscriber"]},
-//                         then:true,
-//                         else:false
-//                     }
-//                 }
-//             }
-//         },
-//         {
-//             $project:{
-//                 username:1,
-//                 email:1,
-//                 fullName:1,
-//                 subscribersCount:1,
-//                 subscribedToCount:1,
-//                 isSubscribed:1,
-//                 avatar:1,
-//                 coverImage:1
-//             }
-//         }
-//     ])
-//     if (!channel?.length) {
-//         throw new ApiError(400,"channel not found");
-//     }
-
-//     return res.status(200).json(new ApiResponse(200,channel[0],"channel fetched successfully"))
-
-// })
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
     const { username } = req.params
@@ -561,4 +476,4 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 })
 
 
-export { userRegistration,verifyEmail, loginUser, logoutUser, changeCurrentPassword, getCurrentUser, refreshAccessToken, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, getWatchHistory }
+export { userRegistration, verifyEmail, loginUser, logoutUser, changeCurrentPassword, getCurrentUser, refreshAccessToken, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, getWatchHistory }

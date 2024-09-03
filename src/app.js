@@ -26,8 +26,7 @@ import CommentRouter from "./routes/comment.router.js"
 import LikeRouter from "./routes/like.route.js"
 import PlaylistRouter from "./routes/playlist.route.js"
 import DashboardRouter from "./routes/dashboard.route.js"
-import { sendVerificationEmail } from './helpers/sendEmail.js'
-import { resend } from './helpers/resend.js'
+
 
 app.use('/api/v1/users', userRouter)
 app.use("/api/v1/subscription", subscriptionRouter);

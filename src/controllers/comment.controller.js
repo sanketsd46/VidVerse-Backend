@@ -84,8 +84,7 @@ const addComment = asyncHandler(async (req, res) => {
 
 
     const {videoId} = req.params;
-    console.log(videoId);
-    
+  
     if(!isValidObjectId(videoId)){
         throw new ApiError(400 , "Invalid video id")
         }

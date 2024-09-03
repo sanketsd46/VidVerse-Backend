@@ -10,9 +10,7 @@ import { User } from "../models/user.model.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 5, query = "", sortBy, sortType, userId } = req.query;
-    //TODO: get all videos based on query, sort, pagination
-
-    // match the qury condition for both title and description
+   
     const matchCondition = {
         $or: [
             { title: { $regex: query, $options: 'i' } },
@@ -25,10 +23,9 @@ const getAllVideos = asyncHandler(async (req, res) => {
             matchCondition.isPublished = true
     }
 
-    // video.aggregate pipeline for matchingCondition and looking up in users collection
     let videoAggregate;
     try {
-        // dont use await b/c : - Using await with Video.aggregate([...]) would execute the aggregation pipeline immediately, preventing aggregatePaginate from modifying the pipeline for pagination. By not using await, you pass the unexecuted aggregation object to aggregatePaginate, allowing it to append additional stages and handle pagination correctly.
+        
         videoAggregate = Video.aggregate([
             {
                 $match: matchCondition
@@ -53,7 +50,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
             {
                 $addFields: {
                     owner: {
-                        $first: "$owner" // yamule jo array ahe tyatle pahile element jo kamacha ahe toch aapn pick kela 
+                        $first: "$owner" 
                     }
                 }
             },
@@ -70,7 +67,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     }
 
-    // options for aggregatePaginate
     const options = {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -80,7 +76,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
         }
     }
 
-    // video.aggregatePaginate for pagination
     Video.aggregatePaginate(videoAggregate, options)
         .then((result) => {
             try {
@@ -141,10 +136,6 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
-
-
-
-
 
     if (!isValidObjectId(videoId)) {
         throw new ApiError(401, "Invalid VideoId");

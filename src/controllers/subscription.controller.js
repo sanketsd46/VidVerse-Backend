@@ -5,24 +5,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 
 
-const getUserChannelSubscribers = asyncHandler(async (req, res) => {
-    const {_id} = req.user
-
-    const subscribers = await Subscription.aggregate([
-        {
-            $match:{
-                
-            }
-        }
-    ])
-
-   
-    
-
-
-})
-
-
 const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
 
@@ -63,4 +45,4 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
 
 
-  export {toggleSubscription,getUserChannelSubscribers}
+  export {toggleSubscription,}
